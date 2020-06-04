@@ -6,11 +6,11 @@ class Cube {
         this.id = v4();
         this.name = name || 'No name'
         this.description = description
-        this.imageUrl = imageUrl || 'Placeholder'
+        this.imageUrl = imageUrl || 'https://images-na.ssl-images-amazon.com/images/I/61HpQqVQ37L._SY355_.jpg'
         this.difficulty = difficulty || 0
     }
 
-    save() {
+    save(cb) {
         const newCube = {
             id: this.id,
             name: this.name,
@@ -19,7 +19,7 @@ class Cube {
             difficulty: this.difficulty
 
         }
-        saveCube(newCube)
+        saveCube(newCube, cb)
     }
 }
 
