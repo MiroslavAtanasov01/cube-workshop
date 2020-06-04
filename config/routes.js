@@ -1,8 +1,14 @@
+const { getAllCubes } = require('../controllers/cubes')
+const { getCube } = require('../controllers/database')
+
 module.exports = (app) => {
 
     app.get('/', (req, res) => {
-        res.render('index', {
-            title: 'Cube Workshop'
+        getAllCubes((cubes) => {
+            res.render('index', {
+                title: 'Cube Workshop',
+                cubes
+            })
         })
     })
 
@@ -23,8 +29,11 @@ module.exports = (app) => {
     })
 
     app.get('/details/:id', (req, res) => {
-        res.render('details', {
-            title: 'Details Cube | Cube Workshop'
+        getCube(req.params.id, (cube) => {
+            res.render('details', {
+                title: 'Details Cube | Cube Workshop',
+                ...cube
+            })
         })
     })
 
