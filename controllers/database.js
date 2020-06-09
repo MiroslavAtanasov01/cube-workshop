@@ -35,8 +35,24 @@ const getCubes = (cb) => {
     })
 }
 
+const del = (id) => {
+    getCubes(cubes => {
+        const cube = cubes.findIndex(c => c.id === id)
+        cubes.splice(cube, 1)
+
+        fs.writeFile('./config/database.json', JSON.stringify(cubes), err => {
+            if (err) {
+                throw err;
+            }
+            console.log('The file has been deleted');
+        })
+    })
+
+}
+
 module.exports = {
     saveCube,
     getCubes,
-    getCube
+    getCube,
+    del
 }
