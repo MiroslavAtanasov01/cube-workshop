@@ -1,5 +1,6 @@
 const { getAllCubes } = require('../controllers/cubes')
-const { getCube } = require('../controllers/database')
+const { getCube, del } = require('../controllers/database')
+const fs = require('fs')
 const Cube = require('../models/cube')
 
 module.exports = (app) => {
@@ -39,9 +40,8 @@ module.exports = (app) => {
     })
 
     app.get('/details/:id', (req, res) => {
-        console.log(req.params.id);
-
         getCube(req.params.id, (cube) => {
+
             res.render('details', {
                 title: 'Details Cube | Cube Workshop',
                 ...cube
@@ -49,11 +49,10 @@ module.exports = (app) => {
         })
     })
 
-    app.delete('/delete/:id', (req, res) => {
+    app.get('/delete/:id', (req, res) => {
         const id = req.params.id;
-        // getCube(id, (cube) => {
-
-        // })
+        del(id)
+        res.redirect('/')
     })
 
     app.get('*', (req, res) => {
@@ -61,4 +60,4 @@ module.exports = (app) => {
             title: 'Error | Cube Workshop'
         })
     })
-};
+}
