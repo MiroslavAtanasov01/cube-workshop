@@ -1,16 +1,13 @@
-const { getAllCubes } = require('../controllers/cubes')
-const { getCube, del } = require('../controllers/database')
-const fs = require('fs')
+const { getAllCubes, getCube } = require('../controllers/cubes')
 const Cube = require('../models/cube')
 
 module.exports = (app) => {
 
-    app.get('/', (req, res) => {
-        getAllCubes((cubes) => {
-            res.render('index', {
-                title: 'Cube Workshop',
-                cubes
-            })
+    app.get('/', async (req, res) => {
+        const cubes = await getAllCubes()
+        res.render('index', {
+            title: 'Cube Workshop',
+            cubes
         })
     })
 
@@ -33,27 +30,31 @@ module.exports = (app) => {
             imageUrl,
             difficultyLevel
         } = req.body
-        const cube = new Cube(name, description, imageUrl, difficultyLevel)
-        cube.save(() => {
+
+        const cube = new Cube({ name, description, imageUrl, difficulty: difficultyLevel })
+
+        cube.save((err) => {
+            if (err) {
+                console.error(err);
+            }
             res.redirect('/')
         })
     })
 
-    app.get('/details/:id', (req, res) => {
-        getCube(req.params.id, (cube) => {
+    app.get('/details/:id', async (req, res) => {
+        const cube = await getCube(req.params.id)
 
-            res.render('details', {
-                title: 'Details Cube | Cube Workshop',
-                ...cube
-            })
+        res.render('details', {
+            title: 'Details Cube | Cube Workshop',
+            ...cube
         })
     })
 
-    app.get('/delete/:id', (req, res) => {
-        const id = req.params.id;
-        del(id)
-        res.redirect('/')
-    })
+    // app.get('/delete/:id', (req, res) => {
+    //     const id = req.params.id;
+    //     del(id)
+    //     res.redirect('/')
+    // })
 
     app.get('*', (req, res) => {
         res.render('404', {

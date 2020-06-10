@@ -6,8 +6,8 @@ const express = require('express')
 const app = express();
 
 mongoose.connect(config.databaseUrl, {
-    // useNewUrlParser: true,
-    // useUnifiedTopology: true
+    useNewUrlParser: true,
+    useUnifiedTopology: true
 }, (err) => {
     if (err) {
         console.log(err);
