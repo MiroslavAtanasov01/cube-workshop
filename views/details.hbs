@@ -4,24 +4,19 @@
   <p><span>Description:</span> {{description}}</p>
   <p><span>Difficulty level:</span> {{difficulty}}</p>
   <a class="btn" href="/">Back</a>
-  <a class="btn btn-del" href="/delete/{{id}}">Delete</a>
+  <a class="btn btn-del" href="/attach/accessory/{{_id}}">Attach accessory</a>
+  <a class="btn btn-del" href="/delete/{{_id}}">Delete</a>
 </div>
 <h2>Accessories</h2>
 <div class="accessories">
+  {{#each accessories}}
   <div class="accessory">
-    <img src="https://images-na.ssl-images-amazon.com/images/I/61J8UP8pySL._SX425_.jpg" alt="stickerName">
-    <h3>Accessory Name</h3>
-    <p>Accessory Description</p>
+    <img src="{{this.imageUrl}}" alt="stickerName">
+    <h3>{{this.name}}</h3>
+    <p>{{this.description}}</p>
   </div>
-  <div class="accessory">
-    <img src="https://images-na.ssl-images-amazon.com/images/I/61J8UP8pySL._SX425_.jpg" alt="stickerName">
-    <h3>Accessory Name</h3>
-    <p>Accessory Description</p>
-  </div>
-  <div class="accessory">
-    <img src="https://images-na.ssl-images-amazon.com/images/I/61J8UP8pySL._SX425_.jpg" alt="stickerName">
-    <h3>Accessory Name</h3>
-    <p>Accessory Description</p>
-  </div>
+  {{else}}
   <h3 class="italic">This cube has no accessories yet...</h3>
+  {{/each}}
+
 </div>
