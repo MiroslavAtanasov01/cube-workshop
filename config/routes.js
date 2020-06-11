@@ -1,4 +1,4 @@
-const { getAllCubes, getCube, updateCube, getCubeWithAccessories } = require('../controllers/cubes')
+const { getAllCubes, getCube, updateCube, deleteCube, getCubeWithAccessories } = require('../controllers/cubes')
 const { getAccessories } = require('../controllers/accessories')
 const Cube = require('../models/cube')
 const Accessory = require('../models/accessory')
@@ -103,11 +103,14 @@ module.exports = (app) => {
         res.redirect(`/details/${req.params.id}`)
     })
 
-    // app.get('/delete/:id', (req, res) => {
-    //     const id = req.params.id;
-    //     del(id)
-    //     res.redirect('/')
-    // })
+    app.get('/delete/:id', async (req, res) => {
+        await deleteCube(req.params.id, (err) => {
+            if (err) {
+                console.error(err);
+            }
+        })
+        res.redirect('/')
+    })
 
     app.get('*', (req, res) => {
         res.render('404', {
