@@ -33,10 +33,39 @@ const deleteCube = async (id) => {
     return cube
 }
 
+function index(req, res, next) {
+    const { from, to, search } = req.query;
+
+    let query = {};
+    if (search) {
+        query = {
+            ...query, name: { $regex: new RegExp("^" + search.toLowerCase(), "i") }
+        }
+    }
+
+    if (to) {
+        query = { ...query, difficultyLevel: { $lte: +to } };
+    }
+    if (from) {
+        query = { ...query, difficultyLevel: { ...query.difficultyLevel, $gte: +from } };
+    }
+
+    Cube.find(query).then(cubes => {
+        res.render('index', {
+            title: 'Cube Workshop',
+            cubes,
+            search,
+            from,
+            to
+        });
+    }).catch(next);
+}
+
 module.exports = {
     getAllCubes,
     getCube,
     updateCube,
     deleteCube,
-    getCubeWithAccessories
+    getCubeWithAccessories,
+    index
 }

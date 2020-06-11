@@ -1,17 +1,16 @@
-const { getAllCubes, getCube, updateCube, deleteCube, getCubeWithAccessories } = require('../controllers/cubes')
+const { getAllCubes, getCube, updateCube, deleteCube, getCubeWithAccessories, index } = require('../controllers/cubes')
 const { getAccessories } = require('../controllers/accessories')
 const Cube = require('../models/cube')
 const Accessory = require('../models/accessory')
 
 module.exports = (app) => {
 
-    app.get('/', async (req, res) => {
-        const cubes = await getAllCubes()
-        res.render('index', {
-            title: 'Cube Workshop',
-            cubes
-        })
-    })
+    app.get('/', index)
+    // const cubes = await getAllCubes()
+    // res.render('index', {
+    //     title: 'Cube Workshop',
+    //     cubes
+    // })
 
     app.get('/about', (req, res) => {
         res.render('about', {
