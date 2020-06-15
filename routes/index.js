@@ -1,4 +1,4 @@
-const { getAllCubes, getCube, updateCube, deleteCube, getCubeWithAccessories, index } = require('../controllers/cubes')
+const { index } = require('../controllers/cubes')
 const { Router } = require('express')
 
 const router = Router()
@@ -15,9 +15,5 @@ router.get('/about', (req, res) => {
         title: 'About | Cube Workshop'
     })
 })
-
-
-
-
 
 module.exports = router
