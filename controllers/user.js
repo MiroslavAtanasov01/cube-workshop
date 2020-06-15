@@ -1,8 +1,9 @@
-const User = require('../models/user');
-const bcrypt = require('bcrypt')
-const jwt = require('jsonwebtoken')
+const env = process.env.NODE_ENV || 'development'
 
-const privateKey = 'CUBE-WORKSHOP-SOFTUNI'
+const jwt = require('jsonwebtoken')
+const config = require('../config/config')[env]
+const bcrypt = require('bcrypt')
+const User = require('../models/user')
 
 const generateToken = data => {
     const token = jwt.sign(data, privateKey)
@@ -51,7 +52,19 @@ const verifyUser = async (req, res) => {
     return status
 }
 
+const checkAuth = (req, res, next) => {
+    const token = req.cookie['aid']
+
+    if (!token) {
+        res.redirect('/')
+    }
+
+    const decodedObj = jwt.verify(token, config.privateKey)
+    next()
+}
+
 module.exports = {
     saveUser,
-    verifyUser
+    verifyUser,
+    checkAuth
 }

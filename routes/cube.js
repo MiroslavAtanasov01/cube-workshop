@@ -1,8 +1,12 @@
-const { Router } = require('express')
-const { getAllCubes, getCube, updateCube, deleteCube, getCubeWithAccessories, index } = require('../controllers/cubes')
-const Cube = require('../models/cube')
+const env = process.env.NODE_ENV || 'development'
 
-const router = Router()
+const express = require('express')
+const jwt = require('jsonwebtoken')
+const Cube = require('../models/cube')
+const { checkAuth } = require('../controllers/user')
+const { getCubeWithAccessories } = require('../controllers/cubes')
+const config = require('../config/config')[env]
+const router = express.Router()
 
 router.get('/create', (req, res) => {
     res.render('create', {
@@ -10,7 +14,7 @@ router.get('/create', (req, res) => {
     })
 })
 
-router.post('/create', (req, res) => {
+router.post('/create', checkAuth, (req, res) => {
     const {
         name,
         description,
@@ -18,7 +22,10 @@ router.post('/create', (req, res) => {
         difficultyLevel
     } = req.body
 
-    const cube = new Cube({ name, description, imageUrl, difficulty: difficultyLevel })
+    const token = req.cookies['aid']
+    const decodedObject = jwt.verify(token, config.privateKey)
+
+    const cube = new Cube({ name, description, imageUrl, difficulty: difficultyLevel, creatorId: decodedObject.userID })
 
     cube.save((err) => {
         if (err) {
