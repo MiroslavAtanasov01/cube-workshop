@@ -1,6 +1,5 @@
 const { Router } = require('express')
-const User = require('../models/user')
-const { saveUser } = require('../controllers/user')
+const { saveUser, verifyUser } = require('../controllers/user')
 
 const router = Router()
 
@@ -23,6 +22,17 @@ router.post('/register', async (req, res) => {
         return res.redirect('/')
     }
 })
+
+router.post('/login', async (req, res) => {
+    const status = await verifyUser(req, res)
+
+    if (status) {
+        return res.redirect('/')
+    }
+
+    res.redirect('/')
+})
+
 
 
 module.exports = router
