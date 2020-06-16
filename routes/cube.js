@@ -3,18 +3,33 @@ const env = process.env.NODE_ENV || 'development'
 const express = require('express')
 const jwt = require('jsonwebtoken')
 const Cube = require('../models/cube')
-const { checkAuth } = require('../controllers/user')
+const { authAccess, getUserStatus } = require('../controllers/user')
 const { getCubeWithAccessories } = require('../controllers/cubes')
 const config = require('../config/config')[env]
 const router = express.Router()
 
-router.get('/create', (req, res) => {
-    res.render('create', {
-        title: 'Create Cube | Cube Workshop'
+router.get('/edit', authAccess, getUserStatus, (req, res) => {
+    res.render('editCubePage', {
+        title: 'editCube | Cube Workshop',
+        isLoggedIn: req.isLoggedIn,
     })
 })
 
-router.post('/create', checkAuth, (req, res) => {
+router.get('/delete', authAccess, getUserStatus, (req, res) => {
+    res.render('deleteCubePage', {
+        title: 'deleteCube | Cube Workshop',
+        isLoggedIn: req.isLoggedIn,
+    })
+})
+
+router.get('/create', getUserStatus, (req, res) => {
+    res.render('create', {
+        title: 'Create Cube | Cube Workshop',
+        isLoggedIn: req.isLoggedIn,
+    })
+})
+
+router.post('/create', authAccess, authAccess, (req, res) => {
     const {
         name,
         description,
@@ -37,28 +52,17 @@ router.post('/create', checkAuth, (req, res) => {
     })
 })
 
-router.get('/edit', (req, res) => {
-    res.render('editCubePage', {
-        title: 'Login | Cube Workshop'
-    })
-})
-
-router.get('/delete', (req, res) => {
-    res.render('deleteCubePage', {
-        title: 'Register | Cube Workshop'
-    })
-})
-
-router.get('/details/:id', async (req, res) => {
+router.get('/details/:id', getUserStatus, async (req, res) => {
     const cube = await getCubeWithAccessories(req.params.id)
 
     res.render('details', {
         title: 'Details Cube | Cube Workshop',
-        ...cube
+        ...cube,
+        isLoggedIn: req.isLoggedIn,
     })
 })
 
-router.get('/delete/:id', async (req, res) => {
+router.get('/delete/:id', getUserStatus, async (req, res) => {
     await deleteCube(req.params.id, (err) => {
         if (err) {
             console.error(err);

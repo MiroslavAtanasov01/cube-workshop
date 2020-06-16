@@ -1,17 +1,19 @@
 const { Router } = require('express')
 const { getAccessories } = require('../controllers/accessories')
-const { getAllCubes, getCube, updateCube, deleteCube, getCubeWithAccessories, index } = require('../controllers/cubes')
+const { getCube, updateCube } = require('../controllers/cubes')
+const { authAccess, getUserStatus } = require('../controllers/user')
 const Accessory = require('../models/accessory')
 
 const router = Router()
 
-router.get('/create/accessory', (req, res) => {
+router.get('/create/accessory', getUserStatus, (req, res) => {
     res.render('createAccessory', {
-        title: 'Create Accessory | Cube Workshop'
+        title: 'Create Accessory | Cube Workshop',
+        isLoggedIn: req.isLoggedIn,
     })
 })
 
-router.post('/create/accessory', async (req, res) => {
+router.post('/create/accessory', authAccess, async (req, res) => {
     const {
         name,
         description,
@@ -27,7 +29,7 @@ router.post('/create/accessory', async (req, res) => {
     })
 })
 
-router.get('/attach/accessory/:id', async (req, res) => {
+router.get('/attach/accessory/:id', authAccess, getUserStatus, async (req, res) => {
     const cube = await getCube(req.params.id)
     const accessories = await getAccessories()
     const canAttachAccessory = cube.accessories.length !== accessories.length && accessories.length > 0
@@ -43,11 +45,12 @@ router.get('/attach/accessory/:id', async (req, res) => {
         title: 'Attach Accessory | Cube Workshop',
         ...cube,
         accessories: notAttachedAccessories,
-        canAttachAccessory
+        canAttachAccessory,
+        isLoggedIn: req.isLoggedIn,
     })
 })
 
-router.post('/attach/accessory/:id', async (req, res) => {
+router.post('/attach/accessory/:id', authAccess, async (req, res) => {
     const { accessory } = req.body
     await updateCube(req.params.id, accessory)
 
