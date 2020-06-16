@@ -53,6 +53,7 @@ function index(req, res, next) {
         res.render('index', {
             title: 'Cube Workshop',
             cubes,
+            isLoggedIn: req.isLoggedIn,
             search,
             from,
             to
