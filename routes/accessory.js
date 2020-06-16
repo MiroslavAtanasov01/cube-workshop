@@ -1,7 +1,7 @@
 const { Router } = require('express')
-const { getAccessories } = require('../controllers/accessories')
-const { getCube, updateCube } = require('../controllers/cubes')
 const { authAccess, getUserStatus } = require('../controllers/user')
+const { attachedAccessories } = require('../controllers/accessories')
+const { updateCube } = require('../controllers/cubes')
 const Accessory = require('../models/accessory')
 
 const router = Router()
@@ -29,32 +29,32 @@ router.post('/create/accessory', authAccess, async (req, res) => {
     })
 })
 
-router.get('/attach/accessory/:id', authAccess, getUserStatus, async (req, res) => {
-    const cube = await getCube(req.params.id)
-    const accessories = await getAccessories()
-    const canAttachAccessory = cube.accessories.length !== accessories.length && accessories.length > 0
+router.get('/attach/accessory/:id', authAccess, getUserStatus, async (req, res, next) => {
+    const { id: cubeId } = req.params
+    try {
+        const data = await attachedAccessories(cubeId)
 
-    const cubeAccessories = cube.accessories.map(acc => acc._id.valueOf().toString())
-
-    const notAttachedAccessories = accessories.filter(acc => {
-        const accessoriesToString = acc._id.valueOf().toString()
-        return !cubeAccessories.includes(accessoriesToString)
-    })
-
-    res.render('attachAccessory', {
-        title: 'Attach Accessory | Cube Workshop',
-        ...cube,
-        accessories: notAttachedAccessories,
-        canAttachAccessory,
-        isLoggedIn: req.isLoggedIn,
-    })
+        res.render('attachAccessory', {
+            title: 'Attach accessory | Cube Workshop',
+            ...data,
+            isLoggedIn: req.isLoggedIn
+        });
+    } catch (err) {
+        next(err)
+    }
 })
 
-router.post('/attach/accessory/:id', authAccess, async (req, res) => {
-    const { accessory } = req.body
-    await updateCube(req.params.id, accessory)
+router.post('/attach/accessory/:id', authAccess, async (req, res, next) => {
+    const { accessory: accessoryId } = req.body
+    const { id: cubeId } = req.params
 
-    res.redirect(`/details/${req.params.id}`)
+    try {
+        await updateCube(cubeId, accessoryId)
+        res.redirect(`/details/${cubeId}`)
+    } catch (err) {
+        next(err)
+    }
+
 })
 
 module.exports = router
