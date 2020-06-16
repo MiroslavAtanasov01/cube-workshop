@@ -1,5 +1,5 @@
-const { index } = require('../controllers/cubes')
 const { Router } = require('express')
+const { index } = require('../controllers/cubes')
 const { getUserStatus } = require('../controllers/user')
 
 const router = Router()
