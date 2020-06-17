@@ -4,15 +4,34 @@ const express = require('express')
 const jwt = require('jsonwebtoken')
 const Cube = require('../models/cube')
 const { authAccess, getUserStatus } = require('../controllers/user')
-const { getCubeWithAccessories } = require('../controllers/cubes')
+const { getCubeWithAccessories, editCube } = require('../controllers/cubes')
 const config = require('../config/config')[env]
 const router = express.Router()
 
-router.get('/edit', authAccess, getUserStatus, (req, res) => {
+router.get('/edit/:id', authAccess, getUserStatus, async (req, res) => {
+    const cube = await getCubeWithAccessories(req.params.id)
+
     res.render('editCubePage', {
-        title: 'editCube | Cube Workshop',
+        title: 'Edit cube| Cube Workshop',
+        cube,
         isLoggedIn: req.isLoggedIn,
     })
+})
+
+router.post('/edit/:id', authAccess, getUserStatus, async (req, res, next) => {
+    const {
+        name,
+        description,
+        imageUrl,
+        difficultyLevel
+    } = req.body
+
+    try {
+        await editCube(req.params.id, { name, description, imageUrl, difficulty: difficultyLevel })
+        res.redirect(`/details/${req.params.id}`)
+    } catch (err) {
+        next(err)
+    }
 })
 
 router.get('/delete', authAccess, getUserStatus, (req, res) => {
@@ -29,7 +48,7 @@ router.get('/create', getUserStatus, (req, res) => {
     })
 })
 
-router.post('/create', authAccess, authAccess, (req, res) => {
+router.post('/create', authAccess, (req, res) => {
     const {
         name,
         description,
@@ -60,15 +79,6 @@ router.get('/details/:id', getUserStatus, async (req, res) => {
         ...cube,
         isLoggedIn: req.isLoggedIn,
     })
-})
-
-router.get('/delete/:id', getUserStatus, async (req, res) => {
-    await deleteCube(req.params.id, (err) => {
-        if (err) {
-            console.error(err);
-        }
-    })
-    res.redirect('/')
 })
 
 module.exports = router
