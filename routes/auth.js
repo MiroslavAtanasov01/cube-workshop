@@ -18,18 +18,32 @@ router.get('/register', guestAccess, getUserStatus, (req, res) => {
 })
 
 router.post('/register', async (req, res) => {
-    const status = await saveUser(req, res)
+    const { password, repeatPassword } = req.body
 
-    if (status) {
-        return res.redirect('/')
+    if (!password || password.length < 8 || password.match(/^[A-Za-z0-9]+$/g) || password !== repeatPassword) {
+        return res.render('registerPage', {
+            error: 'Username or password is not valid'
+        })
     }
+
+    const { error } = await saveUser(req, res)
+
+    if (error) {
+        return res.render('registerPage', {
+            error: 'Username or password is not valid'
+        })
+    }
+
+    res.redirect('/')
 })
 
 router.post('/login', async (req, res) => {
-    const status = await verifyUser(req, res)
+    const { error } = await verifyUser(req, res)
 
-    if (status) {
-        return res.redirect('/')
+    if (error) {
+        return res.render('loginPage', {
+            error: 'Username or password is not correct'
+        })
     }
 
     res.redirect('/')

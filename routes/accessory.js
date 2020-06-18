@@ -19,14 +19,18 @@ router.post('/create/accessory', authAccess, async (req, res) => {
         description,
         imageUrl
     } = req.body
-    const accessory = new Accessory({ name, description, imageUrl })
+    const accessory = new Accessory({ name: name.trim(), description: description.trim(), imageUrl })
 
-    await accessory.save((err) => {
-        if (err) {
-            console.error(err);
-        }
-        res.redirect('/')
-    })
+    try {
+        await accessory.save()
+        return res.redirect('/')
+    } catch (err) {
+        return res.render('createAccessory', {
+            title: 'Create Accessory | Cube Workshop',
+            isLoggedIn: req.isLoggedIn,
+            error: 'Accessory details is not valid'
+        })
+    }
 })
 
 router.get('/attach/accessory/:id', authAccess, getUserStatus, async (req, res, next) => {
