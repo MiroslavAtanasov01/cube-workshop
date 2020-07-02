@@ -1,12 +1,11 @@
 const env = process.env.NODE_ENV || 'development'
+const config = require('../config/config')[env]
 
-const express = require('express')
+const router = require('express')()
 const jwt = require('jsonwebtoken')
 const Cube = require('../models/cube')
 const { authAccess, getUserStatus } = require('../controllers/user')
 const { getCubeWithAccessories, editCube, deleteCube } = require('../controllers/cubes')
-const config = require('../config/config')[env]
-const router = express.Router()
 
 router.get('/edit/:id', authAccess, getUserStatus, async (req, res) => {
     const cube = await getCubeWithAccessories(req.params.id)
@@ -14,17 +13,11 @@ router.get('/edit/:id', authAccess, getUserStatus, async (req, res) => {
     res.render('editCubePage', {
         title: 'Edit cube| Cube Workshop',
         cube,
-        isLoggedIn: req.isLoggedIn,
     })
 })
 
 router.post('/edit/:id', authAccess, getUserStatus, async (req, res, next) => {
-    const {
-        name,
-        description,
-        imageUrl,
-        difficultyLevel
-    } = req.body
+    const { name, description, imageUrl, difficultyLevel } = req.body
 
     try {
         await editCube(req.params.id, { name, description, imageUrl, difficulty: difficultyLevel })
@@ -39,7 +32,6 @@ router.get('/delete/:id', authAccess, getUserStatus, async (req, res) => {
     res.render('deleteCubePage', {
         title: 'deleteCube | Cube Workshop',
         ...cube,
-        isLoggedIn: req.isLoggedIn,
     })
 })
 
@@ -55,7 +47,6 @@ router.post('/delete/:id', authAccess, getUserStatus, async (req, res) => {
 router.get('/create', getUserStatus, (req, res) => {
     res.render('create', {
         title: 'Create Cube | Cube Workshop',
-        isLoggedIn: req.isLoggedIn,
     })
 })
 
@@ -85,7 +76,6 @@ router.get('/details/:id', getUserStatus, async (req, res) => {
     res.render('details', {
         title: 'Details Cube | Cube Workshop',
         ...cube,
-        isLoggedIn: req.isLoggedIn,
     })
 })
 

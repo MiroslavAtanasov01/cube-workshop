@@ -19,6 +19,16 @@ const getCubeWithAccessories = async (id) => {
     return cube
 }
 
+const editCube = async (id, data) => {
+    const cube = Cube.findByIdAndUpdate(id, data)
+    return cube
+}
+
+const deleteCube = async (id) => {
+    const cube = await Cube.findByIdAndRemove(id)
+    return cube
+}
+
 const updateCube = async (cubeId, accessoryId) => {
     try {
         await Cube.findByIdAndUpdate(cubeId, {
@@ -36,45 +46,6 @@ const updateCube = async (cubeId, accessoryId) => {
     }
 }
 
-const editCube = async (id, data) => {
-    const cube = Cube.findByIdAndUpdate(id, data)
-    return cube
-}
-
-const deleteCube = async (id) => {
-    const cube = await Cube.findByIdAndRemove(id)
-    return cube
-}
-
-function index(req, res, next) {
-    const { from, to, search } = req.query;
-
-    let query = {};
-    if (search) {
-        query = {
-            ...query, name: { $regex: new RegExp("^" + search.toLowerCase(), "i") }
-        }
-    }
-
-    if (to) {
-        query = { ...query, difficultyLevel: { $lte: +to } };
-    }
-    if (from) {
-        query = { ...query, difficultyLevel: { ...query.difficultyLevel, $gte: +from } };
-    }
-
-    Cube.find(query).then(cubes => {
-        res.render('index', {
-            title: 'Cube Workshop',
-            cubes,
-            isLoggedIn: req.isLoggedIn,
-            search,
-            from,
-            to
-        });
-    }).catch(next);
-}
-
 module.exports = {
     getAllCubes,
     getCube,
@@ -82,5 +53,4 @@ module.exports = {
     deleteCube,
     editCube,
     getCubeWithAccessories,
-    index
 }
