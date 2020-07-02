@@ -1,24 +1,18 @@
-const { Router } = require('express')
+const router = require('express')()
 const { authAccess, getUserStatus } = require('../controllers/user')
 const { attachedAccessories } = require('../controllers/accessories')
 const { updateCube } = require('../controllers/cubes')
 const Accessory = require('../models/accessory')
 
-const router = Router()
 
 router.get('/create/accessory', getUserStatus, (req, res) => {
     res.render('createAccessory', {
         title: 'Create Accessory | Cube Workshop',
-        isLoggedIn: req.isLoggedIn,
     })
 })
 
 router.post('/create/accessory', authAccess, async (req, res) => {
-    const {
-        name,
-        description,
-        imageUrl
-    } = req.body
+    const { name, description, imageUrl } = req.body
     const accessory = new Accessory({ name: name.trim(), description: description.trim(), imageUrl })
 
     try {
@@ -27,7 +21,6 @@ router.post('/create/accessory', authAccess, async (req, res) => {
     } catch (err) {
         return res.render('createAccessory', {
             title: 'Create Accessory | Cube Workshop',
-            isLoggedIn: req.isLoggedIn,
             error: 'Accessory details is not valid'
         })
     }
@@ -41,7 +34,6 @@ router.get('/attach/accessory/:id', authAccess, getUserStatus, async (req, res, 
         res.render('attachAccessory', {
             title: 'Attach accessory | Cube Workshop',
             ...data,
-            isLoggedIn: req.isLoggedIn
         });
     } catch (err) {
         next(err)

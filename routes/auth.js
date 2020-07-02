@@ -1,19 +1,15 @@
-const { Router } = require('express')
-const { saveUser, verifyUser, guestAccess, getUserStatus } = require('../controllers/user')
+const router = require('express')()
+const { saveUser, verifyUser, getUserStatus } = require('../controllers/user')
 
-const router = Router()
-
-router.get('/login', guestAccess, getUserStatus, (req, res) => {
+router.get('/login', getUserStatus, (req, res) => {
     res.render('loginPage', {
         title: 'Login | Cube Workshop',
-        isLoggedIn: req.isLoggedIn,
     })
 })
 
-router.get('/register', guestAccess, getUserStatus, (req, res) => {
+router.get('/register', getUserStatus, (req, res) => {
     res.render('registerPage', {
         title: 'Register | Cube Workshop',
-        isLoggedIn: req.isLoggedIn,
     })
 })
 
