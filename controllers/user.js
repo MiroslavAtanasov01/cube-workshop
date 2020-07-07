@@ -22,11 +22,8 @@ const saveUser = async (req, res) => {
         const userObj = await user.save()
 
         if (status) {
-            const token = generateToken({
-                userID: userObj._id,
-                username: userObj.username
-            })
-            res.cookie('aid', token);
+            const token = generateToken({ userID: userObj._id, username: userObj.username })
+            res.cookie(config.cookie, token).cookie('username', username)
         }
         return token
     } catch (err) {
@@ -49,33 +46,30 @@ const verifyUser = async (req, res) => {
                 message: 'There is no such user'
             }
         }
-        const status = bcrypt.compare(password, user.password)
+        const status = await bcrypt.compare(password, user.password)
 
         if (status) {
-            const token = generateToken({
-                userID: user._id,
-                username: user.username
-            })
-            res.cookie('aid', token);
+            const token = generateToken({ userID: user._id, username: user.username })
+            res.cookie(config.cookie, token).cookie('username', username)
         }
         return {
             error: !status,
             message: status || 'Wrong password'
         }
-    } catch (error) {
+    } catch (err) {
         return {
             error: true,
             message: 'There is no such user',
             status
         }
     }
-
 }
 
 const authAccess = (req, res, next) => {
-    const token = req.cookies['aid']
+    const token = req.cookies[config.cookie]
+
     if (!token) {
-        return res.redirect('/')
+        return res.redirect('/login')
     }
 
     try {
@@ -86,24 +80,8 @@ const authAccess = (req, res, next) => {
     }
 }
 
-const getUserStatus = (req, res, next) => {
-    const token = req.cookies['aid']
-    if (!token) {
-        req.isLoggedIn = false
-    }
-
-    try {
-        jwt.verify(token, config.privateKey)
-        req.isLoggedIn = true
-    } catch (e) {
-        req.isLoggedIn = false
-    }
-    next()
-}
-
 module.exports = {
     saveUser,
     verifyUser,
     authAccess,
-    getUserStatus,
 }

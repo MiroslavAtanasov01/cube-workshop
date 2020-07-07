@@ -1,13 +1,13 @@
 const router = require('express')()
-const { saveUser, verifyUser, getUserStatus } = require('../controllers/user')
+const { saveUser, verifyUser } = require('../controllers/user')
 
-router.get('/login', getUserStatus, (req, res) => {
+router.get('/login', (req, res) => {
     res.render('loginPage', {
         title: 'Login | Cube Workshop',
     })
 })
 
-router.get('/register', getUserStatus, (req, res) => {
+router.get('/register', (req, res) => {
     res.render('registerPage', {
         title: 'Register | Cube Workshop',
     })
@@ -18,7 +18,7 @@ router.post('/register', async (req, res) => {
 
     if (!password || password.length < 8 || password.match(/^[A-Za-z0-9]+$/g) || password !== repeatPassword) {
         return res.render('registerPage', {
-            error: 'Username or password is not valid'
+            error: 'Password is not valid'
         })
     }
 

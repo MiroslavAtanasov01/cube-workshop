@@ -1,11 +1,11 @@
 const router = require('express')()
-const { authAccess, getUserStatus } = require('../controllers/user')
+const { authAccess } = require('../controllers/user')
 const { attachedAccessories } = require('../controllers/accessories')
 const { updateCube } = require('../controllers/cubes')
 const Accessory = require('../models/accessory')
 
 
-router.get('/create/accessory', getUserStatus, (req, res) => {
+router.get('/create/accessory', authAccess, (req, res) => {
     res.render('createAccessory', {
         title: 'Create Accessory | Cube Workshop',
     })
@@ -26,10 +26,12 @@ router.post('/create/accessory', authAccess, async (req, res) => {
     }
 })
 
-router.get('/attach/accessory/:id', authAccess, getUserStatus, async (req, res, next) => {
+router.get('/attach/accessory/:id', authAccess, async (req, res, next) => {
     const { id: cubeId } = req.params
     try {
         const data = await attachedAccessories(cubeId)
+        console.log(data);
+
 
         res.render('attachAccessory', {
             title: 'Attach accessory | Cube Workshop',
